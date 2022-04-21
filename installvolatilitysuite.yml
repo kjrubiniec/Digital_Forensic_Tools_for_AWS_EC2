@@ -1,0 +1,36 @@
+#---
+#- name: Install VolatilitySuite
+#  hosts: all
+#  gather_facts: no
+#
+#
+#  tasks:
+    - name: Update apt
+      shell: apt update
+      ignore_errors: True
+      become: yes
+
+    - name: Install git
+      shell: apt install -y git
+      ignore_errors: True
+      become: yes
+
+    - name: Install Python3 PIP module
+      shell: apt install -y python3-pip
+      ignore_errors: True
+      become: yes
+
+    - name: Install Yara-Python module for Python using PIP
+      shell: python3 -m pip install yara-python
+      ignore_errors: True
+      become: yes
+
+    - name: Install pefile module for Python using PIP
+      shell: python3 -m pip install pefile
+      ignore_errors: True
+      become: yes
+      
+    - name: Clone VolatilitySuite git repository
+      shell: git clone https://github.com/volatilityfoundation/volatility3
+      ignore_errors: True
+      become: yes

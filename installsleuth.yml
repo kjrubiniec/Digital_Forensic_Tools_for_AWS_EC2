@@ -1,0 +1,5 @@
+- name: Install Sleuth
+  apt:
+    name: sleuthkit
+    state: latest
+  become: true

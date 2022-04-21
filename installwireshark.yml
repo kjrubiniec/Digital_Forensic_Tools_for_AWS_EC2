@@ -1,0 +1,5 @@
+- name: Install Wireshark       
+  apt:
+    name: tshark
+    state: latest
+  become: true

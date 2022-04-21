@@ -1,0 +1,45 @@
+---
+- name: Install tools script
+  hosts: all
+  vars_prompt:
+  - name: input1
+    prompt: Select area of study Computer Forensics(1), E-mail Forensics(2) IoT Forensics(3), Memory Forensics(4), or Network Forensics(5)
+    private: false
+  gather_facts: false
+
+    
+    
+  tasks:
+    - name: Update repository list
+      shell: apt update
+      ignore_errors: True
+      become: true
+
+    - name: Install Computer Forensics tools (TheSleuthKit).
+      include_tasks: installsleuth.yml
+      when:  input1 == '1'
+
+    - name: Install E-mail Forensics tools (EmailHarvester).
+      include_tasks: installemailharvester.yml
+      when:  input1 == '2'
+
+    - name: Install IoT Forensics tools (Regripper).
+      include_tasks: installrip.yml
+      when: input1 == '3'
+
+    - name: Install Memory Forensics tools (VolatilitySuite).
+      include_tasks: installvolatilitysuite.yml
+      when: input1 == '4'
+
+    - name: Install Network Forensics tools (WireShark).
+      include_tasks: installwireshark.yml
+      when: input1 == '5'
+
+    - name: Create an error message for incorrect input
+      ansible.builtin.debug:
+        msg: Incorrect value provided - {{ input1 }}
+      when: (input1 != '1' and input1 != '2' and input1 != '3' and input1 != '4' and input1 != '5')
+      
+    - name: Create Readme file with commands
+      shell: echo "How to use the tools provided \n TheSleuthKit - http://bit.ly/tsk-commands" \\n EmailHarvester - ./EmailHarvester/EmailHarvester.py \\n RegRipper - ./RegRipper3.0/rip.pl \\n VolatilitySuite - ./volatility3/vol.py \\n WireShark - tshark \\n > /home/admin/README.txt
+      ignore_errors: True

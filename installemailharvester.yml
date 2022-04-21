@@ -1,0 +1,41 @@
+#---
+#- name: Install EmailHarvester
+#  hosts: all
+#  gather_facts: no
+#
+#
+#  tasks:
+    - name: Update apt
+      shell: apt update
+      ignore_errors: True
+      become: yes
+
+    - name: Install git
+      shell: apt install -y git
+      ignore_errors: True
+      become: yes
+
+    - name: Install Python3 PIP module
+      shell: apt install -y python3-pip
+      ignore_errors: True
+      become: yes
+
+    - name: Clone EmailHarvester git repository
+      shell: git clone https://github.com/maldevel/EmailHarvester
+      ignore_errors: True
+      become: yes
+
+    - name: Install required modules for Python using PIP
+      shell: python3 -m pip install -r requirements.txt
+      ignore_errors: True
+      become: yes
+      args:
+        chdir: EmailHarvester/
+        
+    - name: Make EmailHarvester.py executable
+      shell: chmod 0777 EmailHarvester.py
+      ignore_errors: True
+      become: yes
+      args:
+        chdir: EmailHarvester/
+        warn: false

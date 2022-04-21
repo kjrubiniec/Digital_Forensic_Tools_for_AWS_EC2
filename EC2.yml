@@ -1,0 +1,77 @@
+---
+
+- hosts: localhost
+  connection: local
+  gather_facts: False
+  vars_prompt:
+  - name: key_name
+    prompt: Input key pair name (as shown in AWS)
+    private: false
+  - name: region
+    prompt: Input region name
+    private: false
+    default: "us-east-1"
+  - name: user_ip
+    prompt: Input user ip in format A.B.C.D/32 name
+    private: false
+    default: "172.0.0.1/32"
+  - name: volume_size
+    prompt: Input volume size in GB
+    private: false
+    default: 8
+  - name: count
+    prompt: Input number of instances
+    private: false
+    default: 1
+
+  vars:
+   image: ami-07d02ee1eeb0c996c
+   security_group: "DigitalForensics"
+
+
+  tasks:
+
+    - name: Create security group
+      ec2_group:
+         name: "{{ security_group }}"
+         description: "Sec group for Digital Forensics"
+         region: "{{ region }}"
+         aws_access_key: "{{ ec2_access_key }}"
+         aws_secret_key: "{{ ec2_secret_key }}"
+         rules:
+            - proto: tcp
+              ports:
+               - 22
+              cidr_ip: "{{ user_ip }}"
+              rule_desc: allow all on ssh port
+      register: result_sec_group
+
+    - name: Provision instances
+      ec2:
+         key_name: "{{ key_name }}"
+         aws_access_key: "{{ ec2_access_key }}"
+         aws_secret_key: "{{ ec2_secret_key }}"
+         group: "{{ security_group }}"
+         instance_type: t2.micro
+         image: "{{ image }}"
+         region: "{{ region }}"
+         wait: true
+         volumes:
+          - device_name: /dev/xvda
+            volume_type: gp2
+            volume_size: "{{ volume_size }}"
+         exact_count: "{{ count }}"
+         count_tag:
+            Name: DigitalForensicsTest
+         instance_tags:
+            Name: DigitalForensicsTest
+            os: Debian 10 (buster)
+      register: ec2
+
+# Attempt at automatically initialising second script
+
+#    - name : Add instance to host group
+#      add_host:
+#         hostname: "{{ item.public_ip }}"
+#         groupname: launched
+#      loop: "{{ ec2.instances }}"
